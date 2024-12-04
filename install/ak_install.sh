@@ -98,9 +98,9 @@ akile_monitor_fe_config(){
             ws_is="ws://"
         fi
         echo "{
-            \"socket\": \"$ws_is$shconfig_ws_address$shconfig_web_uri1\",
-            \"apiURL\": \"$shconfig_weburl\"
-        }"
+\"socket\": \"$ws_is$shconfig_ws_address$shconfig_web_uri1\",
+\"apiURL\": \"$shconfig_weburl\"
+}"
     else
         echo -e "${Red}尚未安装 akile_monitor_fe 主控前端，请先安装${Font}"
         exit 1
@@ -124,6 +124,7 @@ uninstall_akile_monitor(){
     rm /etc/systemd/system/ak_monitor.service
     systemctl daemon-reload
     rm -f /etc/ak_monitor/ak_monitor
+    rm -f /etc/ak_monitor/ak_monitor.db
     rm -f /etc/ak_monitor/config.json
     echo -e "${Green}卸载完毕${Font}"
     sed -i "s|^shconfig_akile_monitor=\"[^\"]*\"|shconfig_akile_monitor=\"false\"|" $config_file
@@ -145,6 +146,17 @@ uninstall_ak_client(){
     rm -f /etc/ak_monitor/client.json
     echo -e "${Green}卸载完毕${Font}"
     sed -i "s|^shconfig_ak_client=\"[^\"]*\"|shconfig_ak_client=\"false\"|" $config_file
+}
+
+bind_AkileMonitorBot(){
+    if [ "$shconfig_akile_monitor" = "true" ]; then
+        get_server_ip
+        echo -e "${Green}复制以下命令，发送给TG上的 @AkileMonitorBot https://t.me/AkileMonitorBot${Font}"  
+        echo -e "${Red}/bind http://$server_ip:$shconfig_listen$shconfig_hook_uri $shconfig_hook_token${Font}"
+    else
+        echo -e "${Red}尚未安装 akile_monitor 主控后端，请先安装${Font}"
+        exit 1
+    fi
 }
 
 clear
@@ -171,8 +183,9 @@ else
     echo -e "${Green}8、卸载akile_monitor主控后端${Font}"
     echo -e "${Green}9、卸载akile_monitor_fe主控前端${Font}"
     echo -e "${Green}10、卸载ak_client监控端${Font}"
+    echo -e "${Green}11、生成 @AkileMonitorBot 绑定命令${Font}"
     echo -e "———————————————————————————————————————"
-    read -p "请输入数字 [0-10]: " choice
+    read -p "请输入数字 [0-11]: " choice
 fi
 
 if [ "$choice" == "0" ]; then
@@ -198,9 +211,11 @@ elif [ "$choice" == "9" ]; then
     uninstall_akile_monitor_fe
 elif [ "$choice" == "10" ]; then
     uninstall_ak_client
+elif [ "$choice" == "11" ]; then
+    bind_AkileMonitorBot
 else
     clear
-    echo -e "${Green}请输入正确的数字 [0-10]${Font}"
+    echo -e "${Green}请输入正确的数字 [0-11]${Font}"
     sleep 1s
     curl -sSL -O https://raw.githubusercontent.com/miaowmint/akile_monitor/refs/heads/main/ak_install.sh && chmod +x ak_install.sh && bash ak_install.sh
 fi
