@@ -2,8 +2,6 @@
 
 ![预览图](https://github.com/akile-network/akile_monitor/blob/main/akile-monitor-cover.jpg?raw=true)
 Demo https://cpu.icu
-
-
 前端项目地址 https://github.com/akile-network/akile_monitor_fe
 
 ## 前后端集合一键脚本
@@ -21,6 +19,12 @@ wget -O ak-setup.sh "https://raw.githubusercontent.com/akile-network/akile_monit
 wget -O setup-monitor.sh "https://raw.githubusercontent.com/akile-network/akile_monitor/refs/heads/main/setup-monitor.sh" && chmod +x setup-monitor.sh && sudo ./setup-monitor.sh
 ```
 
+## 主控前端
+
+```
+wget -O setup-monitor-fe.sh "https://raw.githubusercontent.com/akile-network/akile_monitor/refs/heads/main/setup-monitor-fe.sh" && chmod +x setup-monitor-fe.sh && sudo ./setup-monitor-fe.sh
+```
+
 ## 被控端
 
 ```
@@ -29,6 +33,12 @@ wget -O setup-client.sh "https://raw.githubusercontent.com/akile-network/akile_m
 如
 ```
 wget -O setup-client.sh "https://raw.githubusercontent.com/akile-network/akile_monitor/refs/heads/main/setup-client.sh" && chmod +x setup-client.sh && sudo ./setup-client.sh 123321 wss://123.321.123.321/monitor HKLite-One-Akile
+```
+
+## 三端更新脚本
+
+```
+wget -O ak-update.sh "https://raw.githubusercontent.com/akile-network/akile_monitor/refs/heads/main/ak-update.sh" && chmod +x ak-update.sh && sudo ./ak-update.sh
 ```
 
 ## 主控前端部署教程(cf pages)
