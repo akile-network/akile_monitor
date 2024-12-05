@@ -92,6 +92,7 @@ func GetHost() *model.Host {
 
 	ret.MemTotal = vm.Total
 	ret.SwapTotal = swap.Total
+	ret.ExpireTime = cfg.ExpireTime
 	return &ret
 
 }

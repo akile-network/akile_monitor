@@ -2,5 +2,6 @@
   "auth_secret": "auth_secret",
   "url": "ws://localhost:3000/monitor",
   "net_name": "eth0",
-  "name": "HK-Akile"
+  "name": "HK-Akile",
+  "expire_time": "2024-12-31"
 }

@@ -24,4 +24,5 @@ type Host struct {
 	Arch            string
 	Virtualization  string
 	BootTime        uint64
+	ExpireTime      string
 }

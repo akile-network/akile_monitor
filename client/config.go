@@ -11,6 +11,7 @@ type Config struct {
 	Url        string `json:"url"`
 	NetName    string `json:"net_name"`
 	Name       string `json:"name"`
+	ExpireTime string `json:"expire_time"`
 }
 
 var cfg *Config
