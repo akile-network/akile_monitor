@@ -50,7 +50,7 @@ cd /etc/ak_monitor/frontend
 
 # 下载并解压前端文件
 echo "正在下载前端包..."
-wget -O frontend.zip https://github.com/akile-network/akile_monitor_fe/releases/download/v.0.0.2/akile_monitor_fe.zip
+wget -O frontend.zip https://github.com/akile-network/akile_monitor_fe/releases/download/v0.0.2/akile_monitor_fe.zip
 echo "正在解压文件..."
 unzip -o frontend.zip
 rm frontend.zip
