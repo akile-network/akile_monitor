@@ -56,7 +56,7 @@ jobs:
           context: .
           file: Dockerfile
           push: true
-          platforms: linux/amd64,linux/arm64,linux/riscv64,linux/ppc64le,linux/s390x,linux/arm/v7,linux/arm/v6
+          platforms: linux/amd64,linux/arm64,linux/ppc64le,linux/s390x,linux/arm/v7,linux/arm/v6
           target: server
           tags: ${{ steps.server_meta.outputs.tags }}
           labels: ${{ steps.server_meta.outputs.labels }}
@@ -70,7 +70,7 @@ jobs:
           context: .
           file: Dockerfile
           push: true
-          platforms: linux/amd64,linux/arm64,linux/riscv64,linux/ppc64le,linux/s390x,linux/arm/v7,linux/arm/v6
+          platforms: linux/amd64,linux/arm64,linux/ppc64le,linux/s390x,linux/arm/v7,linux/arm/v6
           target: client
           tags: ${{ steps.client_meta.outputs.tags }}
           labels: ${{ steps.client_meta.outputs.labels }}
