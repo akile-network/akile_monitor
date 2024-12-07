@@ -98,7 +98,8 @@ docker compose up -d
 ```
 git clone https://github.com/akile-network/akile_monitor
 cd akile_monitor
-docker build --tag akile_monitor_server .
+docker build --target server --tag akile_monitor_server .
+docker build --target client --tag akile_monitor_client .
 ```
 
 # 已知问题
