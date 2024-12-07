@@ -14,7 +14,7 @@
 
 # 准备工作
 
-> *以下所有 `/CHANGE_PATH` 替换为你的宿主机路径*
+> *以下所有 `/CHANGE_PATH` 替换为你的宿主机路径, 提前创建以下文件避免Docker自动创建文件夹导致失败*
 
 - [Docker](https://docs.docker.com/get-started/get-docker/) 安装
 
