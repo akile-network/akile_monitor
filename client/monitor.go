@@ -12,6 +12,8 @@ import (
 	"runtime"
 	"strconv"
 	"time"
+	"github.com/docker/docker/client"
+	"context"
 )
 
 func GetState() *model.HostState {
@@ -75,6 +77,29 @@ func GetHost() *model.Host {
 	ret.Arch = hi.KernelArch
 	ret.Virtualization = hi.VirtualizationSystem
 	ret.BootTime = hi.BootTime
+
+	// 检查是否在 Docker 环境中
+	if ret.Virtualization == "docker" {
+		// 创建 Docker 客户端
+		cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+		if err != nil {
+				log.Println("Failed to create Docker client:", err)
+		} else {
+				defer cli.Close()
+
+				// 获取 Docker 信息
+				info, err := cli.Info(context.Background())
+				if err != nil {
+						log.Println("Failed to get Docker info:", err)
+				} else {
+						// 更新宿主机信息
+						ret.Platform = info.OperatingSystem
+						ret.PlatformVersion = ""
+						ret.Arch = info.Architecture
+				}
+		}
+	}
+
 	ci, err := cpu.Info()
 	if err != nil {
 		log.Println("cpu.Info error:", err)
