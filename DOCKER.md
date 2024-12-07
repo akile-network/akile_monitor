@@ -1,7 +1,7 @@
 # Docker 部署介绍
 
 - 将前端[akile_monitor_fe](https://github.com/akile-network/akile_monitor_fe)和主控服务[ak_monitor](https://github.com/akile-network/akile_monitor)打包进一个容器，被控客户端[ak_client](https://github.com/akile-network/akile_monitor)单独打包进另一个容器，并利用 GitHub Actions 自动构建Docker镜像并推送至Docker Hub
-- 前端端口 80 主控服务端 端口 3000 可自行映射到宿主机或反向代理TLS加密
+- 前端 端口80 主控服务端 端口3000 可自行映射到宿主机或反向代理TLS加密
 - 前端配置文件 主控服务端配置文件 被控客户端配置文件 共三个配置文件需要修改
 
 ## 支持架构
@@ -93,7 +93,13 @@ EOF
 docker compose up -d
 ```
 
-# Docker Build 自建镜像
+# Github Actions 自动构建镜像
+
+- Fork项目
+- Settings > Secrets and variables > Actions > New repository secret 添加 `DOCKER_USERNAME` (你的 Docker Hub 用户名) 和 `DOCKER_PASSWORD` (你的 Docker Hub 密码) 两个变量
+- Actions 中手动开始工作流 或者 主页Star 或者 修改任意README文档后push触发
+
+# Docker Build 本地构建镜像
 
 ```
 git clone https://github.com/akile-network/akile_monitor
@@ -106,4 +112,4 @@ docker build --target client --tag akile_monitor_client .
 
 > *因为被控客户端在Docker alpine容器内，所以虚拟化始终显示为`docker`*。
 - 解决方法1: 被控客户端采用 二进制部署，详见 [被控端](./README.md)
-- 解决方法2: 忽略虚拟化
+- 解决方法2: 忽略虚拟化显示内容
