@@ -13,7 +13,7 @@ go build
 
 FROM node:lts-alpine AS nodebuild
 WORKDIR /build
-RUN apk add git -y && \
+RUN apk add git && \
 git clone https://github.com/akile-network/akile_monitor_fe.git amf && \
 cd amf && \
 npm install && \
