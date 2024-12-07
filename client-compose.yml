@@ -1,0 +1,12 @@
+services:
+  akile_monitor_client:
+    image: niliaerith/akile_monitor_client
+    container_name: akile_monitor_client
+    hostname: akile_monitor_client
+    restart: always
+    network_mode: host
+    volumes:
+      - /CHANGE_PATH/akile_monitor/client/client.json:/app/client.json
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      TZ: "Asia/Shanghai"

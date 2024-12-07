@@ -42,7 +42,7 @@ docker run -it --name akile_monitor_server --restart always -v /CHANGE_PATH/akil
 ## Docker Compose 部署
 
 ```compose.yml
-cat <<EOF > compose.yml
+cat <<EOF > server-compose.yml
 services:
   akile_monitor_server:
     image: niliaerith/akile_monitor_server
@@ -59,7 +59,7 @@ services:
     environment:
       TZ: "Asia/Shanghai"
 EOF
-docker compose up -d
+docker compose -f server-compose.yml up -d
 ```
 
 # 被控客户端 部署
@@ -76,7 +76,7 @@ docker run -it --name akile_monitor_client --restart always -v /CHANGE_PATH/akil
 ## Docker Compose 部署
 
 ```compose.yml
-cat <<EOF > compose.yml
+cat <<EOF > client-compose.yml
 services:
   akile_monitor_client:
     image: niliaerith/akile_monitor_client
@@ -90,7 +90,7 @@ services:
     environment:
       TZ: "Asia/Shanghai"
 EOF
-docker compose up -d
+docker compose -f client-compose.yml up -d
 ```
 
 # Github Actions 自动构建镜像

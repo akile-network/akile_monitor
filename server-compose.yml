@@ -1,0 +1,15 @@
+services:
+  akile_monitor_server:
+    image: niliaerith/akile_monitor_server
+    container_name: akile_monitor_server
+    hostname: akile_monitor_server
+    restart: always
+    ports:
+      - 80:80 #前端 端口
+      - 3000:3000 #主控服务端 端口
+    volumes:
+      - /CHANGE_PATH/akile_monitor/server/config.json:/app/config.json 
+      - /CHANGE_PATH/akile_monitor/server/ak_monitor.db:/app/ak_monitor.db
+      - /CHANGE_PATH/akile_monitor/caddy/config.json:/usr/share/caddy/config.json
+    environment:
+      TZ: "Asia/Shanghai"
