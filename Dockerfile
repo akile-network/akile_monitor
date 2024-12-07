@@ -1,4 +1,4 @@
-FROM golang:alpine AS gobuild
+FROM golang AS gobuild
 WORKDIR /build
 COPY . /build
 RUN go mod download && \
@@ -11,7 +11,7 @@ go mod tidy && \
 go mod verify && \
 go build
 
-FROM node:lts-alpine AS nodebuild
+FROM node:lts-slim AS nodebuild
 WORKDIR /build
 RUN apk add git && \
 git clone https://github.com/akile-network/akile_monitor_fe.git amf && \
