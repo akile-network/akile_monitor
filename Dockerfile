@@ -13,7 +13,8 @@ go build
 
 FROM node:lts-slim AS nodebuild
 WORKDIR /build
-RUN apk add git && \
+RUN apt update && \
+apt install git -y && \
 git clone https://github.com/akile-network/akile_monitor_fe.git amf && \
 cd amf && \
 npm install && \
