@@ -16,6 +16,12 @@ function install_monitor() {
  ./setup-monitor.sh
 }
 
+function go_rust_script() {
+ wget -O setup-client-rs.sh "https://ghp.ci/https://raw.githubusercontent.com/GenshinMinecraft/ak_monitor_client_rs/refs/heads/main/setup-client-rs.sh" 
+ chmod +x setup-client-rs.sh
+ bash ./setup-client-rs.sh
+}
+
 function uninstall_monitor() {
  systemctl stop ak_monitor
  systemctl disable ak_monitor
@@ -77,10 +83,11 @@ while true; do
  echo "4.安装被控"
  echo "5.卸载被控"
  echo "6.查看被控config"
- echo "7.退出"
+ echo "7.前往第三方 Rust 版被控安装脚本"
+ echo "8.退出"
  echo "============================================="
  
- read -p "Please select an option (0-7): " choice
+ read -p "Please select an option (0-8): " choice
  
  case $choice in
      0) install_monitor_fe ;;
@@ -90,7 +97,8 @@ while true; do
      4) install_client ;;
      5) uninstall_client ;;
      6) view_client_config ;;
-     7) exit 0 ;;
+     7) go_rust_script ;;
+     8) exit 0 ;;
      *) echo "Invalid option" ;;
  esac
  
