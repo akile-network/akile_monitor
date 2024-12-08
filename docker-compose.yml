@@ -22,9 +22,11 @@ services:
     ports:
       - 80:80 #前端 端口
     volumes:
-      - /CHANGE_PATH/akile_monitor/caddy/config.json:/usr/share/caddy/config.json
+      - /CHANGE_PATH/akile_monitor/caddy/config.json:/usr/share/caddy/config.json # 与环境变量二选一
     environment:
       TZ: "Asia/Shanghai"
+      SOCKETURL: "ws://192.168.31.64:3000/ws" # 与配置文件二选一
+      APIURL: "http://192.168.31.64:3000" # 与配置文件二选一
 
   akile_monitor_client:
     image: niliaerith/akile_monitor_client

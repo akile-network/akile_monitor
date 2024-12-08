@@ -15,16 +15,6 @@
 
 - [Docker](https://docs.docker.com/get-started/get-docker/) 安装
 
-## 前端
-
-- 前端配置文件 `/CHANGE_PATH/akile_monitor/caddy/config.json` 参考如下
-```
-{
-  "socket": "ws://192.168.31.64:3000/ws",
-  "apiURL": "http://192.168.31.64:3000"
-}
-```
-
 ## 主控服务端
 
 - [主控服务端配置文件](https://github.com/akile-network/akile_monitor/blob/main/config.json) `/CHANGE_PATH/akile_monitor/config.json`
@@ -36,12 +26,24 @@
 
 # [compose文件](./docker-compose.yml)
 
+## 前端(可通过环境变量配置或前端配置文件)
+
+- 配置文件环境变量 `SOCKETURL` `APIURL`
+
+- 前端配置文件 `/CHANGE_PATH/akile_monitor/caddy/config.json` 参考如下
+```
+{
+  "socket": "ws://192.168.31.64:3000/ws",
+  "apiURL": "http://192.168.31.64:3000"
+}
+```
+
 # 主控服务端
 
 ## Docker Cli 部署
 
 ```
-docker run -it --name akile_monitor_server --restart always -v /CHANGE_PATH/akile_monitor/server/config.json:/app/config.json -v /CHANGE_PATH/akile_monitor/server/ak_monitor.db:/app/ak_monitor.db -p 3000:3000 -e TZ "Asia/Shanghai" niliaerith/akile_monitor_server
+docker run -it --name akile_monitor_server --restart always -v /CHANGE_PATH/akile_monitor/server/config.json:/app/config.json -v /CHANGE_PATH/akile_monitor/server/ak_monitor.db:/app/ak_monitor.db -p 3000:3000 -e TZ="Asia/Shanghai" niliaerith/akile_monitor_server
 ```
 
 ## Docker Compose 部署
@@ -70,7 +72,7 @@ docker compose -f server-compose.yml up -d
 ## Docker Cli 部署
 
 ```
-docker run -it --name akile_monitor_server --restart always -v /CHANGE_PATH/akile_monitor/caddy/config.json:/usr/share/caddy/config.json -p 80:80 -e TZ "Asia/Shanghai" niliaerith/akile_monitor_fe
+docker run -it --name akile_monitor_server --restart always -v /CHANGE_PATH/akile_monitor/caddy/config.json:/usr/share/caddy/config.json -p 80:80 -e TZ="Asia/Shanghai" -e SOCKETURL="ws://192.168.31.64:3000/ws" -e APIURL="http://192.168.31.64:3000" niliaerith/akile_monitor_fe
 ```
 
 ## Docker Compose 部署
@@ -86,22 +88,24 @@ services:
     ports:
       - 80:80 #前端 端口
     volumes:
-      - /CHANGE_PATH/akile_monitor/caddy/config.json:/usr/share/caddy/config.json
+      - /CHANGE_PATH/akile_monitor/caddy/config.json:/usr/share/caddy/config.json # 与环境变量二选一
     environment:
       TZ: "Asia/Shanghai"
+      SOCKETURL: "ws://192.168.31.64:3000/ws" # 与配置文件二选一
+      APIURL: "http://192.168.31.64:3000" # 与配置文件二选一
 EOF
 docker compose -f fe-compose.yml up -d
 ```
 
 # 被控客户端 部署
 
-- 必须添加 `host` 网络模式，否则识别的流量为容器内的
-- 必须添加 `/var/run/docker.sock` 卷，否则识别的系统为容器内的
+- 必须添加 `host` 网络模式，否则识别为容器内流量
+- 必须添加 `/var/run/docker.sock` 卷，否则识别为容器内系统
 
 ## Docker Cli 部署
 
 ```
-docker run -it --name akile_monitor_client --restart always -v /CHANGE_PATH/akile_monitor/client/client.json:/app/client.json -v /var/run/docker.sock:/var/run/docker.sock --net host -e TZ "Asia/Shanghai" niliaerith/akile_monitor_client
+docker run -it --name akile_monitor_client --restart always -v /CHANGE_PATH/akile_monitor/client/client.json:/app/client.json -v /var/run/docker.sock:/var/run/docker.sock --net host -e TZ="Asia/Shanghai" niliaerith/akile_monitor_client
 ```
 
 ## Docker Compose 部署
