@@ -35,6 +35,16 @@ jobs:
             type=raw,value=latest
             {{date 'YYYY/MM/DD/hh/mm/ss'}}
 
+      - name: akile monitor frontend meta
+        id: fe_meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ secrets.DOCKER_USERNAME }}/akile_monitor_fe
+          tags: |
+            type=raw,value=latest
+            {{date 'YYYY/MM/DD/hh/mm/ss'}}
+
       - name: akile monitor client meta
         id: client_meta
         uses: docker/metadata-action@v5
@@ -65,6 +75,20 @@ jobs:
           labels: ${{ steps.server_meta.outputs.labels }}
       - name: server Image digest
         run: echo ${{ steps.docker_build_server.outputs.digest }}
+
+      - name: Build and push frontend
+        id: docker_build_fe
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          platforms: linux/amd64,linux/arm64
+          target: fe
+          tags: ${{ steps.server_meta.outputs.tags }}
+          labels: ${{ steps.server_meta.outputs.labels }}
+      - name: fe Image digest
+        run: echo ${{ steps.docker_build_fe.outputs.digest }}
 
       - name: Build and push client
         id: docker_build_client

@@ -19,23 +19,23 @@ cd amf && \
 npm install && \
 npm run build
 
-FROM caddy:latest AS server
+FROM alpine:latest AS server
 WORKDIR /app
 COPY --from=gobuild /build/akile_monitor /app/ak_monitor
 COPY --from=gobuild /build/config.json /app/config.json
 
+RUN chmod +x /app/ak_monitor
+
+EXPOSE 3000
+
+CMD ["/app/ak_monitor"]
+
+FROM caddy:latest AS fe
+WORKDIR /app
+
 COPY --from=nodebuild /build/amf/dist /usr/share/caddy
-RUN cat <<EOF > /app/entrypoint.sh
-#!/bin/sh
-caddy run --config /etc/caddy/Caddyfile --adapter caddyfile &
-/app/ak_monitor
-EOF
 
-RUN chmod +x /app/entrypoint.sh /app/ak_monitor
-
-EXPOSE 80 3000
-
-CMD ["/app/entrypoint.sh"]
+EXPOSE 80
 
 FROM alpine AS client
 WORKDIR /app

@@ -1,6 +1,6 @@
 # Docker 部署介绍
 
-- 将前端[akile_monitor_fe](https://github.com/akile-network/akile_monitor_fe)和主控服务[ak_monitor](https://github.com/akile-network/akile_monitor)打包进一个容器，被控客户端[ak_client](https://github.com/akile-network/akile_monitor)单独打包进另一个容器，并利用 GitHub Actions 自动构建Docker镜像并推送至Docker Hub
+- 将前端[akile_monitor_fe](https://github.com/akile-network/akile_monitor_fe)，主控服务[ak_monitor](https://github.com/akile-network/akile_monitor)以及被控客户端[ak_client](https://github.com/akile-network/akile_monitor)打包进容器，并利用 GitHub Actions 自动构建Docker镜像并推送至Docker Hub
 - 前端 端口80 主控服务端 端口3000 可自行映射到宿主机或反向代理TLS加密
 - 前端配置文件 主控服务端配置文件 被控客户端配置文件 共三个配置文件需要修改
 
@@ -15,7 +15,7 @@
 
 - [Docker](https://docs.docker.com/get-started/get-docker/) 安装
 
-## 前端+主控服务端
+## 前端
 
 - 前端配置文件 `/CHANGE_PATH/akile_monitor/caddy/config.json` 参考如下
 ```
@@ -24,6 +24,9 @@
   "apiURL": "http://192.168.31.64:3000"
 }
 ```
+
+## 主控服务端
+
 - [主控服务端配置文件](https://github.com/akile-network/akile_monitor/blob/main/config.json) `/CHANGE_PATH/akile_monitor/config.json`
 - SQLite数据库 `/CHANGE_PATH/akile_monitor/ak_monitor.db`
 
@@ -31,12 +34,14 @@
 
 - [被控客户端配置文件](https://github.com/akile-network/akile_monitor/blob/main/client.json) `/CHANGE_PATH/akile_monitor/client.json`
 
-# 主控服务端+前端 部署
+# [compose文件](./docker-compose.yml)
+
+# 主控服务端
 
 ## Docker Cli 部署
 
 ```
-docker run -it --name akile_monitor_server --restart always -v /CHANGE_PATH/akile_monitor/server/config.json:/app/config.json -v /CHANGE_PATH/akile_monitor/server/ak_monitor.db:/app/ak_monitor.db -v /CHANGE_PATH/akile_monitor/caddy/config.json:/usr/share/caddy/config.json -p 80:80 -p 3000:3000 -e TZ "Asia/Shanghai" niliaerith/akile_monitor_server
+docker run -it --name akile_monitor_server --restart always -v /CHANGE_PATH/akile_monitor/server/config.json:/app/config.json -v /CHANGE_PATH/akile_monitor/server/ak_monitor.db:/app/ak_monitor.db -p 3000:3000 -e TZ "Asia/Shanghai" niliaerith/akile_monitor_server
 ```
 
 ## Docker Compose 部署
@@ -50,16 +55,42 @@ services:
     hostname: akile_monitor_server
     restart: always
     ports:
-      - 80:80 #前端 端口
       - 3000:3000 #主控服务端 端口
     volumes:
       - /CHANGE_PATH/akile_monitor/server/config.json:/app/config.json 
       - /CHANGE_PATH/akile_monitor/server/ak_monitor.db:/app/ak_monitor.db
-      - /CHANGE_PATH/akile_monitor/caddy/config.json:/usr/share/caddy/config.json
     environment:
       TZ: "Asia/Shanghai"
 EOF
 docker compose -f server-compose.yml up -d
+```
+
+# 前端 部署
+
+## Docker Cli 部署
+
+```
+docker run -it --name akile_monitor_server --restart always -v /CHANGE_PATH/akile_monitor/caddy/config.json:/usr/share/caddy/config.json -p 80:80 -e TZ "Asia/Shanghai" niliaerith/akile_monitor_fe
+```
+
+## Docker Compose 部署
+
+```compose.yml
+cat <<EOF > fe-compose.yml
+services:
+  akile_monitor_fe:
+    image: niliaerith/akile_monitor_fe
+    container_name: akile_monitor_fe
+    hostname: akile_monitor_fe
+    restart: always
+    ports:
+      - 80:80 #前端 端口
+    volumes:
+      - /CHANGE_PATH/akile_monitor/caddy/config.json:/usr/share/caddy/config.json
+    environment:
+      TZ: "Asia/Shanghai"
+EOF
+docker compose -f fe-compose.yml up -d
 ```
 
 # 被控客户端 部署
@@ -105,6 +136,7 @@ docker compose -f client-compose.yml up -d
 git clone https://github.com/akile-network/akile_monitor
 cd akile_monitor
 docker build --target server --tag akile_monitor_server .
+docker build --target fe --tag akile_monitor_fe .
 docker build --target client --tag akile_monitor_client .
 ```
 
