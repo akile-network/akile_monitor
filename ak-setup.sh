@@ -83,11 +83,11 @@ while true; do
  echo "4.安装被控"
  echo "5.卸载被控"
  echo "6.查看被控config"
- echo "7.前往第三方 Rust 版主控后端安装脚本"
+ echo "7.前往第三方 Rust 版被控安装脚本"
  echo "8.退出"
  echo "============================================="
  
- read -p "Please select an option (0-7): " choice
+ read -p "Please select an option (0-8): " choice
  
  case $choice in
      0) install_monitor_fe ;;
