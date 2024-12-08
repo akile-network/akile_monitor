@@ -32,6 +32,11 @@ wget -O setup-client.sh "https://raw.githubusercontent.com/akile-network/akile_m
 wget -O setup-client.sh "https://raw.githubusercontent.com/akile-network/akile_monitor/refs/heads/main/setup-client.sh" && chmod +x setup-client.sh && sudo ./setup-client.sh 123321 wss://123.321.123.321/monitor HKLite-One-Akile
 ```
 
+第三方 Rust 版本
+```
+wget -O setup-client-rs.sh "https://ghp.ci/https://raw.githubusercontent.com/GenshinMinecraft/ak_monitor_client_rs/refs/heads/main/setup-client-rs.sh" && chmod +x setup-client-rs.sh && sudo bash ./setup-client-rs.sh
+```
+
 ## 主控前端部署教程(cf pages)
 
 ### 1.下载
