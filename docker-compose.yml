@@ -1,0 +1,50 @@
+services:
+
+  akile_monitor_server:
+    image: niliaerith/akile_monitor_server
+    container_name: akile_monitor_server
+    hostname: akile_monitor_server
+    restart: always
+    ports:
+      - 3000:3000 #主控服务端 端口
+    volumes:
+      - /CHANGE_PATH/akile_monitor/server/ak_monitor.db:/app/ak_monitor.db
+    environment:
+      TZ: "Asia/Shanghai"
+      AUTH_SECRET: "auth_secret"
+      LISTEN: ":3000"
+      ENABLE_TG: false
+      TG_TOKEN: "your_telegram_bot_token"
+      HOOK_URI: "/hook"
+      UPDATE_URI: "/monitor"
+      WEB_URI: "/ws"
+      HOOK_TOKEN: "hook_token"
+      TG_CHAT_ID: 0
+
+  akile_monitor_fe:
+    image: niliaerith/akile_monitor_fe
+    container_name: akile_monitor_fe
+    hostname: akile_monitor_fe
+    restart: always
+    ports:
+      - 80:80 #前端 端口
+    environment:
+      TZ: "Asia/Shanghai"
+      SOCKET: "ws://192.168.31.64:3000/ws"
+      APIURL: "http://192.168.31.64:3000"
+
+  akile_monitor_client:
+    image: niliaerith/akile_monitor_client
+    container_name: akile_monitor_client
+    hostname: akile_monitor_client
+    restart: always
+    network_mode: host
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      TZ: "Asia/Shanghai"
+      AUTH_SECRET: "auth_secret" 
+      URL: "ws://localhost:3000/monitor" 
+      NET_NAME: "eth0" 
+      NAME: "HK-Akile"
+

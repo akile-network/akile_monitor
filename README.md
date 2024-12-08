@@ -6,14 +6,14 @@ Demo https://cpu.icu
 
 前端项目地址 https://github.com/akile-network/akile_monitor_fe
 
+## [Docker部署](./DOCKER.md)
+
 ## 前后端集合一键脚本
 
 ```
 wget -O ak-setup.sh "https://raw.githubusercontent.com/akile-network/akile_monitor/refs/heads/main/ak-setup.sh" && chmod +x ak-setup.sh && sudo ./ak-setup.sh
 ```
 ![image](https://github.com/user-attachments/assets/58b9209b-a327-4783-b9dd-4e0dc2ecbf7e)
-
-
 
 ## 主控后端
 
