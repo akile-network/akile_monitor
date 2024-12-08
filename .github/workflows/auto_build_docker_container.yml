@@ -85,8 +85,8 @@ jobs:
           push: true
           platforms: linux/amd64,linux/arm64
           target: fe
-          tags: ${{ steps.server_meta.outputs.tags }}
-          labels: ${{ steps.server_meta.outputs.labels }}
+          tags: ${{ steps.fe_meta.outputs.tags }}
+          labels: ${{ steps.fe_meta.outputs.labels }}
       - name: fe Image digest
         run: echo ${{ steps.docker_build_fe.outputs.digest }}
 
