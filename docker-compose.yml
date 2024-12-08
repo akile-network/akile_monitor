@@ -22,11 +22,9 @@ services:
     ports:
       - 80:80 #前端 端口
     volumes:
-      - /CHANGE_PATH/akile_monitor/caddy/config.json:/usr/share/caddy/config.json # 与环境变量二选一
+      - /CHANGE_PATH/akile_monitor/caddy/config.json:/usr/share/caddy/config.json
     environment:
       TZ: "Asia/Shanghai"
-      SOCKETURL: "ws://192.168.31.64:3000/ws" # 与配置文件二选一
-      APIURL: "http://192.168.31.64:3000" # 与配置文件二选一
 
   akile_monitor_client:
     image: niliaerith/akile_monitor_client
@@ -39,3 +37,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       TZ: "Asia/Shanghai"
+      auth_secret: "59deb879-f735-41b9-85ea-a80c26dcce5b8273c215-ab97-4a3e-b7d6-1cbd2afcd2d4"
+      url: "ws://oracle.oni.li/monitor"
+      net_name: "eth0"
+      name: "US VKVM"
+
