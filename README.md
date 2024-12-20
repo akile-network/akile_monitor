@@ -35,7 +35,7 @@ wget -O setup-client.sh "https://raw.githubusercontent.com/akile-network/akile_m
 
 ### 1.下载
 
-https://github.com/akile-network/akile_monitor_fe/releases/download/v.0.0.2/akile_monitor_fe.zip
+https://github.com/akile-network/akile_monitor_fe/releases/download/v0.0.2/akile_monitor_fe.zip
 
 
 ### 2.修改config.json为自己的api地址（公网地址）（如果前端要加ssl 后端也要加ssl 且此处记得改为https和wss）
