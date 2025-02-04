@@ -18,6 +18,9 @@ fi
 # Stop existing service if running
 systemctl stop ak_client
 
+# sync time
+apt-get install systemd-timesyncd
+
 # Function to detect main network interface
 get_main_interface() {
    local interfaces=$(ip -o link show | awk -F': ' ' \
