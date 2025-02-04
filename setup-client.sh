@@ -25,15 +25,6 @@ get_main_interface() {
        split($2, arr, "@"); if (arr[1] != "") print arr[1] }')
    
    local interface_count=$(echo "$interfaces" | wc -l)
-
-   # 如果只有一个合适的接口，直接使用它
-   if [ "$interface_count" -eq 1 ]; then
-       echo "仅检测到一个可用接口，直接监控该接口信息:" >&2
-       echo "$interfaces" >&2
-       show_interface_traffic "$interfaces" >&2
-       echo "$interfaces"
-       return
-   fi
    
    # 格式化流量大小的函数
    format_bytes() {
@@ -65,6 +56,15 @@ get_main_interface() {
            echo "   无法读取流量信息"
        fi
    }
+
+   # 如果只有一个合适的接口，直接使用它
+   if [ "$interface_count" -eq 1 ]; then
+       echo "仅检测到一个可用接口，直接监控该接口信息:" >&2
+       echo "$interfaces" >&2
+       show_interface_traffic "$interfaces" >&2
+       echo "$interfaces"
+       return
+   fi
    
    # 如果没有找到合适的接口或有多个接口时显示所有可用接口
    echo "所有可用的网卡接口:" >&2
