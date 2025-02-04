@@ -20,11 +20,20 @@ systemctl stop ak_client
 
 # Function to detect main network interface
 get_main_interface() {
-   local interfaces=$(ip -o link show | \
-       awk -F': ' '$2 !~ /^((lo|docker|veth|br-|virbr|tun|vnet|wg|vmbr|dummy|gre|sit|vlan|lxc|lxd|warp|tap))/{print $2}' | \
-       grep -v '@')
+   local interfaces=$(ip -o link show | awk -F': ' ' \
+       $2 !~ /^(lo|docker|veth|br-|virbr|tun|vnet|wg|vmbr|dummy|gre|sit|vlan|lxc|lxd|warp|tap)/ { \
+       split($2, arr, "@"); if (arr[1] != "") print arr[1] }')
    
    local interface_count=$(echo "$interfaces" | wc -l)
+
+   # 如果只有一个合适的接口，直接使用它
+   if [ "$interface_count" -eq 1 ]; then
+       echo "仅检测到一个可用接口，直接监控该接口信息:" >&2
+       echo "$interfaces" >&2
+       show_interface_traffic "$interfaces" >&2
+       echo "$interfaces"
+       return
+   fi
    
    # 格式化流量大小的函数
    format_bytes() {
