@@ -6,7 +6,6 @@ import (
 	"compress/gzip"
 	"context"
 	"fmt"
-	"github.com/cloudwego/hertz/pkg/common/json"
 	"io"
 	"log"
 	"regexp"
@@ -16,6 +15,7 @@ import (
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/app/server"
+	"github.com/cloudwego/hertz/pkg/common/json"
 	"github.com/glebarez/sqlite"
 	"github.com/hertz-contrib/cors"
 	"github.com/hertz-contrib/websocket"
@@ -174,6 +174,17 @@ func main() {
 	h.GET(cfg.WebUri, ws)
 	h.GET(cfg.HookUri, Hook)
 	h.POST("/delete", DeleteHost)
+	h.StaticFS("/", &app.FS{
+		Root:               cfg.Frontend,
+		IndexNames:         []string{"index.html"}, // 设置默认索引文件为 index.html
+		GenerateIndexPages: false,                  // 禁止生成索引页面，可选
+		Compress:           false,                  // 不启用压缩，可选
+		AcceptByteRange:    false,                  // 不接受字节范围请求，可选
+		PathRewrite:        nil,
+		PathNotFound: func(ctx context.Context, c *app.RequestContext) {
+			c.NotFound()
+		},
+	})
 	h.Spin()
 }
 

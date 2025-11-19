@@ -9,6 +9,7 @@ import (
 type Config struct {
 	AuthSecret string `json:"auth_secret"`
 	Listen     string `json:"listen"`
+	Frontend   string `json:"frontend"`
 	EnableTG   bool   `json:"enable_tg"`
 	TgToken    string `json:"tg_token"`
 	UpdateUri  string `json:"update_uri"`
