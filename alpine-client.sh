@@ -137,6 +137,12 @@ name="AkileCloud Monitor Service"
 
 # 定义服务的执行路径，将使用该路径启动服务程序
 command="/etc/ak_monitor/client"
+directory="/etc/ak_monitor"
+command_background=true
+pidfile="/run/ak_client.pid"
+supervisor=supervise-daemon
+respawn_delay=5
+respawn_max=0
 
 # 定义服务的启动参数
 # command_args="--param1 value1 --param2 value2"
@@ -148,47 +154,6 @@ description="Custom service for ${name}"
 depend() {
     # 指定该服务需要网络（net 服务）支持
     need net
-}
-
-# 在启动服务之前的预处理函数
-start_pre() {
-    # 打印启动前的消息
-    ebegin "Preparing to start ${name}"
-    # 可以在这里添加任何启动服务之前的准备工作
-    eend $? # eend 会输出函数操作的结果状态，$? 表示上一个命令的返回值
-}
-
-# 启动服务的函数
-start() {
-    # 打印启动消息
-    ebegin "Starting ${name}"
-    # 切换到工作目录
-    cd /etc/ak_monitor/
-    # 使用 start-stop-daemon 命令启动服务
-    start-stop-daemon --start --exec ${command}
-    eend $? # 输出启动操作的结果状态
-}
-
-# 停止服务的函数
-stop() {
-    # 打印停止消息
-    ebegin "Stopping ${name}"
-    # 使用 start-stop-daemon 命令停止服务
-    start-stop-daemon --stop --exec ${command}
-    eend $? # 输出停止操作的结果状态
-}
-
-# 重新启动服务的函数
-restart() {
-    # 打印重新启动消息
-    ebegin "Restarting ${name}"
-    # 停止服务
-    start-stop-daemon --stop --exec ${command}
-    # 等待 1 秒钟，确保服务完全停止
-    sleep 1
-    # 启动服务
-    start-stop-daemon --start --exec ${command}
-    eend $? # 输出重新启动操作的结果状态
 }
 EOF
 

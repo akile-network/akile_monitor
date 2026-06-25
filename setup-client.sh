@@ -136,8 +136,9 @@ chmod 777 client
 cat > /etc/systemd/system/ak_client.service << 'EOF'
 [Unit]
 Description=AkileCloud Monitor Service
-After=network.target nss-lookup.target
-Wants=network.target
+After=network-online.target nss-lookup.target
+Wants=network-online.target
+StartLimitIntervalSec=0
 
 [Service]
 User=root
@@ -150,7 +151,7 @@ LimitNOFILE=999999999
 WorkingDirectory=/etc/ak_monitor/
 ExecStart=/etc/ak_monitor/client
 Restart=always
-RestartSec=1
+RestartSec=5
 
 [Install]
 WantedBy=multi-user.target

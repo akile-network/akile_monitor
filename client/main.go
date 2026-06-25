@@ -4,12 +4,15 @@ import (
 	"akile_monitor/client/model"
 	"bytes"
 	"compress/gzip"
+	"context"
 	"flag"
+	"fmt"
 	"github.com/cloudwego/hertz/pkg/common/json"
 	"github.com/henrylee2cn/goutil/calendar/cron"
 	"log"
 	"os"
 	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -18,6 +21,42 @@ import (
 func main() {
 	LoadConfig()
 
+	startNetworkTracker()
+
+	flag.Parse()
+	log.SetFlags(0)
+
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+
+	reconnectDelay := time.Second
+	for {
+		connected, err := reportLoop(ctx)
+		if err == nil || ctx.Err() != nil {
+			return
+		}
+
+		if connected {
+			reconnectDelay = time.Second
+		}
+		log.Printf("connection closed: %v; reconnecting in %s", err, reconnectDelay)
+
+		select {
+		case <-time.After(reconnectDelay):
+		case <-ctx.Done():
+			return
+		}
+
+		if reconnectDelay < 30*time.Second {
+			reconnectDelay *= 2
+			if reconnectDelay > 30*time.Second {
+				reconnectDelay = 30 * time.Second
+			}
+		}
+	}
+}
+
+func startNetworkTracker() {
 	go func() {
 		c := cron.New()
 		c.AddFunc("* * * * * *", func() {
@@ -25,44 +64,43 @@ func main() {
 		})
 		c.Start()
 	}()
+}
 
-	flag.Parse()
-	log.SetFlags(0)
-
-	interrupt := make(chan os.Signal, 1)
-	signal.Notify(interrupt, os.Interrupt)
-
+func reportLoop(ctx context.Context) (bool, error) {
 	u := cfg.Url
 	log.Printf("connecting to %s", u)
 
 	c, _, err := websocket.DefaultDialer.Dial(cfg.Url, nil)
 	if err != nil {
-		log.Fatal("dial:", err)
+		return false, fmt.Errorf("dial: %w", err)
 	}
 	defer c.Close()
 
-	c.WriteMessage(websocket.TextMessage, []byte(cfg.AuthSecret))
+	if err := writeMessage(c, websocket.TextMessage, []byte(cfg.AuthSecret)); err != nil {
+		return false, fmt.Errorf("write auth_secret: %w", err)
+	}
 
-	done := make(chan struct{})
-
+	if err := c.SetReadDeadline(time.Now().Add(15 * time.Second)); err != nil {
+		return false, fmt.Errorf("set auth read deadline: %w", err)
+	}
 	_, message, err := c.ReadMessage()
 	if err != nil {
-		log.Println("auth_secret验证失败")
-		log.Println("read:", err)
-		return
+		return false, fmt.Errorf("read auth response: %w", err)
 	}
-	if string(message) == "auth success" {
-		log.Println("auth_secret验证成功")
-		log.Println("正在上报数据...")
+	if err := c.SetReadDeadline(time.Time{}); err != nil {
+		return false, fmt.Errorf("clear auth read deadline: %w", err)
 	}
+	if string(message) != "auth success" {
+		return false, fmt.Errorf("auth_secret验证失败: %s", message)
+	}
+	log.Println("auth_secret验证成功")
+	log.Println("正在上报数据...")
 
 	ticker := time.NewTicker(time.Second)
 	defer ticker.Stop()
 
 	for {
 		select {
-		case <-done:
-			return
 		case t := <-ticker.C:
 			var D struct {
 				Host      *model.Host
@@ -75,39 +113,33 @@ func main() {
 			//gzip压缩json
 			dataBytes, err := json.Marshal(D)
 			if err != nil {
-				log.Println("json.Marshal error:", err)
-				return
+				return true, fmt.Errorf("json.Marshal: %w", err)
 			}
 
 			var buf bytes.Buffer
 			gz := gzip.NewWriter(&buf)
 			if _, err := gz.Write(dataBytes); err != nil {
-				log.Println("gzip.Write error:", err)
-				return
+				return true, fmt.Errorf("gzip.Write: %w", err)
 			}
 
 			if err := gz.Close(); err != nil {
-				log.Println("gzip.Close error:", err)
-				return
+				return true, fmt.Errorf("gzip.Close: %w", err)
 			}
 
-			err = c.WriteMessage(websocket.TextMessage, buf.Bytes())
-			if err != nil {
-				log.Println("write:", err)
-				return
+			if err := writeMessage(c, websocket.TextMessage, buf.Bytes()); err != nil {
+				return true, fmt.Errorf("write metrics: %w", err)
 			}
-		case <-interrupt:
+		case <-ctx.Done():
 			log.Println("interrupt")
-			err := c.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
-			if err != nil {
-				log.Println("write close:", err)
-				return
-			}
-			select {
-			case <-done:
-			case <-time.After(time.Second):
-			}
-			return
+			_ = writeMessage(c, websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
+			return true, nil
 		}
 	}
+}
+
+func writeMessage(c *websocket.Conn, messageType int, data []byte) error {
+	if err := c.SetWriteDeadline(time.Now().Add(10 * time.Second)); err != nil {
+		return err
+	}
+	return c.WriteMessage(messageType, data)
 }
