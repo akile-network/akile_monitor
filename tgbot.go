@@ -73,12 +73,7 @@ func startbot() {
 					}
 
 					//流量对等性
-					var duideng string
-					if downflow > upflow {
-						duideng = fmt.Sprintf("%.2f%%", float64(upflow)/float64(downflow)*100)
-					} else {
-						duideng = fmt.Sprintf("%.2f%%", float64(downflow)/float64(upflow)*100)
-					}
+					duideng := formatTrafficBalance(downflow, upflow)
 
 					msg := fmt.Sprintf(`统计信息
 ===========================
@@ -95,9 +90,9 @@ CPU核心数： %d
 
 更新于：%s UTC`,
 						len(mm), online, cpu,
-						fmt.Sprintf("%.2f%%", float64(memused)/float64(mem)*100),
+						formatPercentage(memused, mem),
 						formatSize(memused), formatSize(mem),
-						fmt.Sprintf("%.2f%%", float64(swapused)/float64(swap)*100),
+						formatPercentage(swapused, swap),
 						formatSize(swapused), formatSize(swap),
 						formatSize(downspeed), formatSize(upspeed),
 						formatSize(downflow), formatSize(upflow),
@@ -210,12 +205,7 @@ func sendOrEditServerStatus(bot *tgbotapi.BotAPI, chatID int64, messageID int, s
 // 格式化服务器信息
 func formatServerMessage(serverName string, m *M) string {
 	//流量对等性
-	var duideng string
-	if m.State.NetInTransfer > m.State.NetOutTransfer {
-		duideng = fmt.Sprintf("%.2f%%", float64(m.State.NetOutTransfer)/float64(m.State.NetInTransfer)*100)
-	} else {
-		duideng = fmt.Sprintf("%.2f%%", float64(m.State.NetInTransfer)/float64(m.State.NetOutTransfer)*100)
-	}
+	duideng := formatTrafficBalance(m.State.NetInTransfer, m.State.NetOutTransfer)
 	return fmt.Sprintf(`服务器: %s
 CPU核心数: %d
 内存: %s [%s/%s]
@@ -230,10 +220,10 @@ CPU核心数: %d
 更新于: %s UTC`,
 		serverName,
 		parseCPU(m.Host.CPU[0]),
-		fmt.Sprintf("%.2f%%", float64(m.State.MemUsed)/float64(m.Host.MemTotal)*100),
+		formatPercentage(m.State.MemUsed, m.Host.MemTotal),
 		formatSize(m.State.MemUsed),
 		formatSize(m.Host.MemTotal),
-		fmt.Sprintf("%.2f%%", float64(m.State.SwapUsed)/float64(m.Host.SwapTotal)*100),
+		formatPercentage(m.State.SwapUsed, m.Host.SwapTotal),
 		formatSize(m.State.SwapUsed),
 		formatSize(m.Host.SwapTotal),
 		formatSize(m.State.NetInSpeed),
